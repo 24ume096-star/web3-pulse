@@ -70,8 +70,16 @@ export default function RootLayout() {
           sessionParams={{
             namespaces: {
               eip155: {
-                methods: ['eth_sendTransaction', 'eth_signTransaction', 'eth_sign', 'personal_sign', 'eth_signTypedData'],
-                chains: ['eip155:10143'], // Monad Testnet
+                methods: ['personal_sign', 'eth_signTypedData'],
+                chains: ['eip155:1'], // Mainnet required for base compatibility
+                events: ['chainChanged', 'accountsChanged'],
+                rpcMap: {},
+              },
+            },
+            optionalNamespaces: {
+              eip155: {
+                methods: ['eth_sendTransaction', 'eth_signTransaction', 'personal_sign', 'eth_signTypedData'],
+                chains: ['eip155:10143'], // Monad Testnet optional
                 events: ['chainChanged', 'accountsChanged'],
                 rpcMap: {
                   10143: 'https://testnet-rpc.monad.xyz',
