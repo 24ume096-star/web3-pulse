@@ -6,15 +6,15 @@ import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import 'react-native-reanimated';
+
 import { WalletConnectModal } from '@walletconnect/modal-react-native';
 import { WalletProvider } from '../src/context/WalletContext';
 import { DemoProvider } from '../src/context/DemoContext';
 import { ReferralProvider } from '../src/context/ReferralContext';
 import { useWallet } from '../src/context/WalletContext';
-
 import { useColorScheme } from '@/components/useColorScheme';
 
-const projectId = '8e35189e1fb0d33e8ca790100f9f3ef4'; // Sample project ID for demo
+const projectId = '8e35189e1fb0d33e8ca790100f9f3ef4';
 
 const providerMetadata = {
   name: 'MonadPulse',
@@ -27,16 +27,13 @@ const providerMetadata = {
 };
 
 export {
-  // Catch any errors thrown by the Layout component.
   ErrorBoundary,
 } from 'expo-router';
 
 export const unstable_settings = {
-  // Ensure that reloading on `/modal` keeps a back button present.
   initialRouteName: '(tabs)',
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
@@ -45,7 +42,6 @@ export default function RootLayout() {
     ...FontAwesome.font,
   });
 
-  // Expo Router uses Error Boundaries to catch errors in the navigation tree.
   useEffect(() => {
     if (error) throw error;
   }, [error]);
@@ -56,14 +52,14 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  if (!loaded) {
-    return null;
-  }
+  if (!loaded) return null;
 
   return (
     <WalletProvider>
       <DemoProvider>
         <RootLayoutNav />
+
+        {/* ✅ FIXED WALLETCONNECT CONFIG */}
         <WalletConnectModal
           projectId={projectId}
           providerMetadata={providerMetadata}
@@ -73,24 +69,24 @@ export default function RootLayout() {
                 methods: [
                   'eth_sendTransaction',
                   'eth_signTransaction',
-                  'eth_sign',
                   'personal_sign',
-                  'eth_signTypedData',
-                  'wallet_addEthereumChain',
-                  'wallet_switchEthereumChain'
+                  'eth_signTypedData'
                 ],
-                chains: ['eip155:10143'], // Required: Monad (Since wallet rejected Mainnet)
+                chains: ['eip155:1'], // REQUIRED chain
                 events: ['chainChanged', 'accountsChanged'],
-                rpcMap: {
-                  10143: 'https://testnet-rpc.monad.xyz',
-                },
               },
             },
             optionalNamespaces: {
               eip155: {
-                methods: ['eth_sendTransaction', 'personal_sign'],
-                chains: ['eip155:1'], // Optional: Mainnet
+                methods: [
+                  'eth_sendTransaction',
+                  'personal_sign'
+                ],
+                chains: ['eip155:10143'], // Monad Testnet
                 events: ['chainChanged', 'accountsChanged'],
+                rpcMap: {
+                  '10143': 'https://testnet-rpc.monad.xyz',
+                },
               },
             },
           }}
