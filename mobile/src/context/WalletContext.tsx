@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { ethers } from 'ethers';
 import { Platform } from 'react-native';
 import { useWalletConnectModal } from '@walletconnect/modal-react-native';
+import { switchToMonad } from '../utils/network';
 
 const MONAD_CHAIN_ID = 10143;
 const MONAD_CHAIN_HEX = '0x279f'; // 10143 in hex
@@ -121,33 +122,24 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }, [isWCConnected, wcProvider]);
 
     const switchNetwork = async () => {
-        const provider = ethersProvider;
-        if (!provider) return;
+        // We need the raw provider for the utility (which uses .request)
+        // For mobile: wcProvider
+        // For web: window.ethereum
 
-        try {
-            await provider.send('wallet_switchEthereumChain', [{ chainId: MONAD_CHAIN_HEX }]);
-        } catch (switchError: any) {
-            // This error code 4902 means the chain has not been added to the wallet
-            if (switchError.code === 4902 || switchError.toString().includes('Unrecognized chain ID')) {
-                try {
-                    await provider.send('wallet_addEthereumChain', [{
-                        chainId: MONAD_CHAIN_HEX,
-                        chainName: 'Monad Testnet',
-                        nativeCurrency: {
-                            name: 'MON',
-                            symbol: 'MON',
-                            decimals: 18
-                        },
-                        rpcUrls: [MONAD_RPC],
-                        blockExplorerUrls: ['https://testnet.monadexplorer.com']
-                    }]);
-                } catch (addError) {
-                    console.error('Failed to add network:', addError);
-                    alert('Could not add Monad network to your wallet.');
-                }
-            } else {
-                console.error('Failed to switch network:', switchError);
+        let rawProvider: any = null;
+
+        if (Platform.OS === 'web') {
+            if (typeof window !== 'undefined' && (window as any).ethereum) {
+                rawProvider = (window as any).ethereum;
             }
+        } else {
+            rawProvider = wcProvider;
+        }
+
+        if (rawProvider) {
+            await switchToMonad(rawProvider);
+        } else {
+            console.error("No provider available to switch network");
         }
     };
 
