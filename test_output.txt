@@ -1,0 +1,78 @@
+﻿node.exe : [31m[1mE
+rror[22m[39m [31m
+[1mHH801:[22m[39m 
+Plugin @nomicfoundati
+on/hardhat-toolbox 
+requires the 
+following 
+dependencies to be 
+installed: @nomicfoun
+dation/hardhat-chai-m
+atchers, @nomicfounda
+tion/hardhat-ethers, 
+@nomicfoundation/hard
+hat-ignition-ethers, 
+@nomicfoundation/hard
+hat-network-helpers, 
+@nomicfoundation/hard
+hat-verify, @typechai
+n/ethers-v6, 
+@typechain/hardhat, 
+@types/chai, 
+@types/mocha, chai, 
+ethers, hardhat-gas-r
+eporter, 
+solidity-coverage, 
+ts-node, typechain.
+At line:1 char:1
++ & "C:\Program Files
+\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo 
+...
++ ~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~
+    + CategoryInfo   
+           : NotSpe  
+  cified: ([31m[   
+ 1mError...ode,     
+typechain.:Strin    
+g) [], RemoteExc    
+eption
+    + FullyQualified 
+   ErrorId : Native  
+  CommandError
+ 
+Please run: npm 
+install --save-dev "@
+nomicfoundation/hardh
+at-chai-matchers@^2.0
+.0" "@nomicfoundation
+/hardhat-ethers@^3.0.
+0" "@nomicfoundation/
+hardhat-ignition-ethe
+rs@^0.15.0" "@nomicfo
+undation/hardhat-netw
+ork-helpers@^1.0.0" "
+@nomicfoundation/hard
+hat-verify@^2.0.0" "@
+typechain/ethers-v6@^
+0.5.0" "@typechain/ha
+rdhat@^9.0.0" 
+"@types/chai@^4.2.0" 
+"@types/mocha@>=9.1.0
+" "chai@^4.2.0" 
+"ethers@^6.4.0" "hard
+hat-gas-reporter@^1.0
+.8" "solidity-coverag
+e@^0.8.1" 
+"ts-node@>=8.0.0" 
+"typechain@^8.3.0"
+
+For more info go to h
+ttps://v2.hardhat.org
+/HH801 or run 
+Hardhat with 
+--show-stack-traces

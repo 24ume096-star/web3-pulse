@@ -1,0 +1,148 @@
+:root {
+  --primary: #836EF9;
+  --primary-glow: rgba(131, 110, 249, 0.5);
+  --bg: #0A0A0B;
+  --surface: #161618;
+  --text: #FFFFFF;
+  --text-dim: #A1A1AA;
+  --success: #10B981;
+  --error: #EF4444;
+  --card-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  line-height: 1.5;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.app-container {
+  max-width: 480px;
+  margin: 0 auto;
+  padding: 20px;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #fff 0%, var(--primary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: 24px;
+  padding: 24px;
+  backdrop-filter: blur(12px);
+  margin-bottom: 20px;
+}
+
+.market-question {
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 16px;
+}
+
+.pool-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.pool-stat {
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.pool-label {
+  font-size: 12px;
+  color: var(--text-dim);
+  text-transform: uppercase;
+}
+
+.pool-value {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.bet-buttons {
+  display: flex;
+  gap: 12px;
+}
+
+.btn {
+  flex: 1;
+  padding: 16px;
+  border-radius: 16px;
+  border: none;
+  font-weight: 700;
+  font-size: 16px;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.2s;
+}
+
+.btn:active {
+  transform: scale(0.95);
+}
+
+.btn-yes {
+  background: var(--success);
+  color: white;
+}
+
+.btn-no {
+  background: var(--error);
+  color: white;
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: white;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 var(--primary-glow); }
+  70% { box-shadow: 0 0 0 10px rgba(131, 110, 249, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(131, 110, 249, 0); }
+}
+
+.pulse-animation {
+  animation: pulse 2s infinite;
+}
+
+.footer {
+  margin-top: auto;
+  text-align: center;
+  padding: 20px;
+  color: var(--text-dim);
+  font-size: 14px;
+}

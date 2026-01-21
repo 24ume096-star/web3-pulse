@@ -1,0 +1,74 @@
+﻿node_modules\.bin\hardhat.
+cmd : [31mAn unexpected 
+error occurred:[39m
+At line:1 char:1
++ node_modules\.bin\hardha
+t.cmd --config 
+hardhat.config.cjs test 
+2>&1 | ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (  
+  [31mAn unexpected err   
+ or occurred:[39m:Str    
+ing) [], RemoteExcept    
+ion
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+
+Error: Cannot find module 
+'C:\Users\ayush\OneDrive\D
+esktop\web3\node_modules\h
+ardhat\types\network' 
+imported from C:\Users\ayu
+sh\OneDrive\Desktop\web3\n
+ode_modules\@nomicfoundati
+on\hardhat-ethers\dist\src
+\type-extensions.js
+    at finalizeResolution 
+(node:internal/modules/esm
+/resolve:274:11)
+    at moduleResolve (node
+:internal/modules/esm/reso
+lve:859:10)
+    at defaultResolve (nod
+e:internal/modules/esm/res
+olve:983:11)
+    at ModuleLoader.#cache
+dDefaultResolve (node:inte
+rnal/modules/esm/loader:73
+1:20)
+    at ModuleLoader.#resol
+veAndMaybeBlockOnLoaderThr
+ead (node:internal/modules
+/esm/loader:767:38)
+    at 
+ModuleLoader.resolveSync (
+node:internal/modules/esm/
+loader:790:52)
+    at ModuleLoader.#cache
+dResolveSync (node:interna
+l/modules/esm/loader:750:2
+5)
+    at ModuleLoader.getMod
+uleJobForRequire (node:int
+ernal/modules/esm/loader:4
+59:50)
+    at new ModuleJobSync (
+node:internal/modules/esm/
+module_job:395:34)
+    at ModuleLoader.getMod
+uleJobForRequire (node:int
+ernal/modules/esm/loader:5
+22:11) {
+  code: 
+'ERR_MODULE_NOT_FOUND',
+  url: 'file:///C:/Users/a
+yush/OneDrive/Desktop/web3
+/node_modules/hardhat/type
+s/network'
+}

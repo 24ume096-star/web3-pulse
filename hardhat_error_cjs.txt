@@ -1,0 +1,71 @@
+﻿node_modules\.bin\hardhat.
+cmd : An unexpected error 
+occurred:
+At line:1 char:1
++ node_modules\.bin\hardha
+t.cmd --config 
+hardhat.config.cjs test 
+--verb ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (A  
+  n unexpected error oc   
+ curred::String) [], R    
+emoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+
+Error [ERR_PACKAGE_PATH_NO
+T_EXPORTED]: Package 
+subpath './common/bigInt' 
+is not defined by 
+"exports" in C:\Users\ayus
+h\OneDrive\Desktop\web3\no
+de_modules\hardhat\package
+.json
+    at exportsNotFound (no
+de:internal/modules/esm/re
+solve:313:10)
+    at 
+packageExportsResolve (nod
+e:internal/modules/esm/res
+olve:660:9)
+    at resolveExports (nod
+e:internal/modules/cjs/loa
+der:650:36)
+    at Function._findPath 
+(node:internal/modules/cjs
+/loader:717:31)
+    at node:internal/modul
+es/cjs/loader:1369:27
+    at m._resolveFilename 
+(file:///C:/Users/ayush/On
+eDrive/Desktop/web3/node_m
+odules/tsx/dist/register-B
+7jrtLTO.mjs:1:789)
+    at defaultResolveImpl 
+(node:internal/modules/cjs
+/loader:1025:19)
+    at 
+resolveForCJSWithHooks (no
+de:internal/modules/cjs/lo
+ader:1030:22)
+    at Function._load (nod
+e:internal/modules/cjs/loa
+der:1192:37)
+    at 
+TracingChannel.traceSync (
+node:diagnostics_channel:3
+22:14) {
+  code: 'ERR_PACKAGE_PATH_
+NOT_EXPORTED'
+}
+
+If you think this is a 
+bug in Hardhat, please 
+report it here: https://ha
+rdhat.org/report-bug

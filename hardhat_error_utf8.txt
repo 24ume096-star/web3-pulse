@@ -1,0 +1,70 @@
+﻿node_modules\.bin\hardhat.
+cmd : An unexpected error 
+occurred:
+At line:1 char:1
++ node_modules\.bin\hardha
+t.cmd test --verbose 2>&1 
+| Out-File -FilePat ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~
+    + CategoryInfo        
+      : NotSpecified: (A  
+  n unexpected error oc   
+ curred::String) [], R    
+emoteException
+    + FullyQualifiedError 
+   Id : NativeCommandErr  
+  or
+ 
+
+ReferenceError: require 
+is not defined in ES 
+module scope, you can use 
+import instead
+This file is being 
+treated as an ES module 
+because it has a '.js' 
+file extension and 'C:\Use
+rs\ayush\OneDrive\Desktop\
+web3\package.json' 
+contains "type": 
+"module". To treat it as 
+a CommonJS script, rename 
+it to use the '.cjs' file 
+extension.
+    at file:///C:/Users/ay
+ush/OneDrive/Desktop/web3/
+hardhat.config.js:1:1
+    at ModuleJob.run (node
+:internal/modules/esm/modu
+le_job:345:25)
+    at async onImport.trac
+ePromise.__proto__ (node:i
+nternal/modules/esm/loader
+:665:26)
+    at async importConfigF
+ileWithTsxFallback (C:\Use
+rs\ayush\OneDrive\Desktop\
+web3\node_modules\hardhat\
+src\internal\config-loadin
+g.ts:145:14)
+    at async 
+importUserConfig (C:\Users
+\ayush\OneDrive\Desktop\we
+b3\node_modules\hardhat\sr
+c\internal\config-loading.
+ts:80:20)
+    at async main (C:\User
+s\ayush\OneDrive\Desktop\w
+eb3\node_modules\hardhat\s
+rc\internal\cli\main.ts:13
+0:24)
+    at async file:///C:/Us
+ers/ayush/OneDrive/Desktop
+/web3/node_modules/hardhat
+/dist/src/cli.js:21:1
+
+If you think this is a 
+bug in Hardhat, please 
+report it here: https://ha
+rdhat.org/report-bug
