@@ -11,6 +11,7 @@ import { WalletConnectModal } from '@walletconnect/modal-react-native';
 import { WalletProvider } from '../src/context/WalletContext';
 import { DemoProvider } from '../src/context/DemoContext';
 import { ReferralProvider } from '../src/context/ReferralContext';
+import { MetadataProvider } from '../src/context/MetadataContext';
 import { useWallet } from '../src/context/WalletContext';
 import { useColorScheme } from '@/components/useColorScheme';
 
@@ -57,40 +58,42 @@ export default function RootLayout() {
   return (
     <WalletProvider>
       <DemoProvider>
-        <RootLayoutNav />
+        <MetadataProvider>
+          <RootLayoutNav />
 
-        {/* ✅ FIXED WALLETCONNECT CONFIG */}
-        <WalletConnectModal
-          projectId={projectId}
-          providerMetadata={providerMetadata}
-          sessionParams={{
-            namespaces: {
-              eip155: {
-                methods: [
-                  'eth_sendTransaction',
-                  'eth_signTransaction',
-                  'personal_sign',
-                  'eth_signTypedData'
-                ],
-                chains: ['eip155:1'], // REQUIRED chain
-                events: ['chainChanged', 'accountsChanged'],
-              },
-            },
-            optionalNamespaces: {
-              eip155: {
-                methods: [
-                  'eth_sendTransaction',
-                  'personal_sign'
-                ],
-                chains: ['eip155:10143'], // Monad Testnet
-                events: ['chainChanged', 'accountsChanged'],
-                rpcMap: {
-                  '10143': 'https://testnet-rpc.monad.xyz',
+          {/* ✅ FIXED WALLETCONNECT CONFIG */}
+          <WalletConnectModal
+            projectId={projectId}
+            providerMetadata={providerMetadata}
+            sessionParams={{
+              namespaces: {
+                eip155: {
+                  methods: [
+                    'eth_sendTransaction',
+                    'eth_signTransaction',
+                    'personal_sign',
+                    'eth_signTypedData'
+                  ],
+                  chains: ['eip155:1'], // REQUIRED chain
+                  events: ['chainChanged', 'accountsChanged'],
                 },
               },
-            },
-          }}
-        />
+              optionalNamespaces: {
+                eip155: {
+                  methods: [
+                    'eth_sendTransaction',
+                    'personal_sign'
+                  ],
+                  chains: ['eip155:10143'], // Monad Testnet
+                  events: ['chainChanged', 'accountsChanged'],
+                  rpcMap: {
+                    '10143': 'https://testnet-rpc.monad.xyz',
+                  },
+                },
+              },
+            }}
+          />
+        </MetadataProvider>
       </DemoProvider>
     </WalletProvider>
   );

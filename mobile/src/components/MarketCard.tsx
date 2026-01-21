@@ -3,6 +3,13 @@ import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Theme } from '../theme';
 import { TrendingUp, Clock, Trophy, Share2, Zap, Users } from 'lucide-react-native';
 
+interface MarketMetadata {
+    isHot?: boolean;
+    suggestedStake?: string;
+    visibilityScore?: number;
+    trendingTopic?: string | null;
+}
+
 interface MarketCardProps {
     question: string;
     yesPool: string;
@@ -14,6 +21,7 @@ interface MarketCardProps {
     onShare?: () => void;
     isDemo?: boolean;
     friendsJoined?: number;
+    metadata?: MarketMetadata;
 }
 
 export const MarketCard: React.FC<MarketCardProps> = ({
@@ -27,14 +35,30 @@ export const MarketCard: React.FC<MarketCardProps> = ({
     onShare,
     isDemo,
     friendsJoined,
+    metadata,
 }) => {
+    // Determine badge type based on metadata
+    const isTrending = metadata?.visibilityScore && metadata.visibilityScore >= 50 && !metadata.isHot;
+    const showBadge = metadata?.isHot || isTrending;
     return (
         <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.9}>
             <View style={styles.header}>
-                <View style={styles.badgeContainer}>
-                    <TrendingUp size={12} color={Theme.colors.primary} />
-                    <Text style={styles.badgeText}>HOT 🔥</Text>
-                </View>
+                {showBadge && (
+                    <View style={[
+                        styles.badgeContainer,
+                        metadata?.isHot ? styles.hotBadge : null,
+                        isTrending ? styles.trendingBadge : null
+                    ]}>
+                        <TrendingUp size={12} color={metadata?.isHot ? '#FF6B6B' : Theme.colors.primary} />
+                        <Text style={[
+                            styles.badgeText,
+                            metadata?.isHot ? styles.hotBadgeText : null,
+                            isTrending ? styles.trendingBadgeText : null
+                        ]}>
+                            {metadata?.isHot ? 'HOT 🔥' : 'TRENDING 📈'}
+                        </Text>
+                    </View>
+                )}
                 {isDemo && (
                     <View style={[styles.badgeContainer, { backgroundColor: 'rgba(255, 215, 0, 0.1)', borderColor: '#FFD700' }]}>
                         <Zap size={10} color="#FFD700" />
@@ -48,6 +72,16 @@ export const MarketCard: React.FC<MarketCardProps> = ({
             </View>
 
             <Text style={styles.question} numberOfLines={2}>{question}</Text>
+
+            {/* Suggested Stake */}
+            {metadata?.suggestedStake && (
+                <View style={styles.suggestedStakeContainer}>
+                    <Zap size={12} color={Theme.colors.primary} />
+                    <Text style={styles.suggestedStakeText}>
+                        Suggested: {metadata.suggestedStake} ETH
+                    </Text>
+                </View>
+            )}
 
             <View style={styles.statsContainer}>
                 <View style={styles.statItem}>
@@ -126,6 +160,39 @@ const styles = StyleSheet.create({
         fontWeight: '800',
         marginLeft: 4,
         letterSpacing: 0.5,
+    },
+    hotBadge: {
+        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+        borderColor: 'rgba(255, 107, 107, 0.3)',
+        borderWidth: 1,
+    },
+    hotBadgeText: {
+        color: '#FF6B6B',
+    },
+    trendingBadge: {
+        backgroundColor: 'rgba(131, 110, 249, 0.1)',
+        borderColor: 'rgba(131, 110, 249, 0.3)',
+        borderWidth: 1,
+    },
+    trendingBadgeText: {
+        color: Theme.colors.primary,
+    },
+    suggestedStakeContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        backgroundColor: 'rgba(131, 110, 249, 0.05)',
+        paddingHorizontal: 10,
+        paddingVertical: 6,
+        borderRadius: 8,
+        marginBottom: Theme.spacing.sm,
+        borderWidth: 1,
+        borderColor: 'rgba(131, 110, 249, 0.1)',
+    },
+    suggestedStakeText: {
+        color: Theme.colors.primary,
+        fontSize: 12,
+        fontWeight: '700',
     },
     poolBadge: {
         flexDirection: 'row',

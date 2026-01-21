@@ -1,17 +1,21 @@
 import React from 'react';
-import { StyleSheet, Text, View, ScrollView, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
+import { StyleSheet, Text, View, ScrollView, SafeAreaView, StatusBar, TouchableOpacity, RefreshControl } from 'react-native';
 import { Theme } from '../theme';
 import { MarketCard } from '../components/MarketCard';
 import { Search, Bell, Filter, User, Zap } from 'lucide-react-native';
 import { useWallet } from '../context/WalletContext';
 import { useDemo } from '../context/DemoContext';
 import { useReferral } from '../context/ReferralContext';
+import { useMetadata } from '../context/MetadataContext';
 import { shareMarket } from '../utils/shareUtility';
 
 export default function HomeScreen({ navigation }: any) {
     const { address, isConnected, connect, balance } = useWallet();
     const { isDemoMode, toggleDemoMode } = useDemo();
     const { referralCode, friendsInMarkets } = useReferral();
+    const { metadata, loading: metadataLoading, refreshMetadata } = useMetadata();
+
+    const [refreshing, setRefreshing] = React.useState(false);
 
     // Expanded Mock Markets with diverse ideologies
     const [markets, setMarkets] = React.useState([
@@ -80,6 +84,24 @@ export default function HomeScreen({ navigation }: any) {
         return () => clearInterval(interval);
     }, []);
 
+    // Sort markets by visibility score (descending)
+    const sortedMarkets = React.useMemo(() => {
+        return [...markets].sort((a, b) => {
+            const metaA = metadata[a.id];
+            const metaB = metadata[b.id];
+            const scoreA = metaA?.visibilityScore || 0;
+            const scoreB = metaB?.visibilityScore || 0;
+            return scoreB - scoreA;
+        });
+    }, [markets, metadata]);
+
+    // Pull to refresh handler
+    const onRefresh = React.useCallback(async () => {
+        setRefreshing(true);
+        await refreshMetadata();
+        setRefreshing(false);
+    }, [refreshMetadata]);
+
     const formatPool = (val: number) => `${val.toLocaleString()} Credits`;
 
     const truncateAddress = (addr: string) => {
@@ -135,16 +157,24 @@ export default function HomeScreen({ navigation }: any) {
             <ScrollView
                 contentContainerStyle={styles.scrollContent}
                 showsVerticalScrollIndicator={false}
+                refreshControl={
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={onRefresh}
+                        tintColor={Theme.colors.primary}
+                        colors={[Theme.colors.primary]}
+                    />
+                }
             >
                 <View style={styles.filterSection}>
                     <Text style={styles.sectionTitle}>Live Challenges</Text>
                     <TouchableOpacity style={styles.sortButton}>
                         <Filter size={16} color={Theme.colors.textDim} />
-                        <Text style={styles.sortText}>Filter</Text>
+                        <Text style={styles.sortText}>Trending</Text>
                     </TouchableOpacity>
                 </View>
 
-                {markets.map(market => (
+                {sortedMarkets.map(market => (
                     <MarketCard
                         key={market.id}
                         question={market.question}
@@ -157,6 +187,7 @@ export default function HomeScreen({ navigation }: any) {
                         onBet={(choice) => handleBet(market.id, choice)}
                         onShare={() => handleShare(market)}
                         friendsJoined={friendsInMarkets[market.id] || 0}
+                        metadata={metadata[market.id]}
                     />
                 ))}
             </ScrollView>
