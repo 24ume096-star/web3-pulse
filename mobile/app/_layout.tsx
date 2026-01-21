@@ -69,8 +69,12 @@ export default function RootLayout() {
           providerMetadata={providerMetadata}
           sessionParams={{
             namespaces: {
-              // Leave valid but empty to allow maximum compatibility
-              // All functionality is requested via optionalNamespaces
+              eip155: {
+                methods: ['personal_sign', 'eth_signTypedData'],
+                chains: ['eip155:1'], // Mainnet REQUIRED (Base compatibility)
+                events: ['chainChanged', 'accountsChanged'],
+                rpcMap: {},
+              },
             },
             optionalNamespaces: {
               eip155: {
@@ -81,7 +85,7 @@ export default function RootLayout() {
                   'personal_sign',
                   'eth_signTypedData',
                 ],
-                chains: ['eip155:1', 'eip155:10143'], // Request both Mainnet and Monad
+                chains: ['eip155:10143'], // Monad Testnet OPTIONAL (Request if supported)
                 events: ['chainChanged', 'accountsChanged'],
                 rpcMap: {
                   10143: 'https://testnet-rpc.monad.xyz',
