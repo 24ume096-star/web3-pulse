@@ -16,6 +16,7 @@ interface WalletContextType {
     connect: () => Promise<void>;
     disconnect: () => Promise<void>;
     switchNetwork: () => Promise<void>;
+    balance: string;
 }
 
 const WalletContext = createContext<WalletContextType | undefined>(undefined);
@@ -143,6 +144,31 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         }
     };
 
+    const [balance, setBalance] = useState<string>('0.00');
+
+    useEffect(() => {
+        const fetchBalance = async () => {
+            if (ethersProvider && (injectedAddress || wcAddress)) {
+                try {
+                    const addr = injectedAddress || wcAddress;
+                    if (addr) {
+                        const bal = await ethersProvider.getBalance(addr);
+                        setBalance(ethers.formatEther(bal)); // Convert wei to ether string
+                    }
+                } catch (err) {
+                    console.error('Error fetching balance:', err);
+                }
+            } else {
+                setBalance('0.00');
+            }
+        };
+
+        fetchBalance();
+        // Optional: Poll for balance updates
+        const interval = setInterval(fetchBalance, 10000);
+        return () => clearInterval(interval);
+    }, [ethersProvider, injectedAddress, wcAddress]);
+
     // Derived state
     const currentAddress = Platform.OS === 'web' ? injectedAddress : wcAddress;
     const currentIsConnected = Platform.OS === 'web' ? isInjected : isWCConnected;
@@ -154,6 +180,7 @@ export const WalletProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 isConnected: !!currentIsConnected,
                 provider: ethersProvider,
                 signer,
+                balance,
                 connect,
                 disconnect,
                 switchNetwork

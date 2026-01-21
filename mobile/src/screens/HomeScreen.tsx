@@ -9,44 +9,87 @@ import { useReferral } from '../context/ReferralContext';
 import { shareMarket } from '../utils/shareUtility';
 
 export default function HomeScreen({ navigation }: any) {
-    const { address, isConnected, connect } = useWallet();
+    const { address, isConnected, connect, balance } = useWallet();
     const { isDemoMode, toggleDemoMode } = useDemo();
     const { referralCode, friendsInMarkets } = useReferral();
 
-    const mockMarkets = [
+    // Expanded Mock Markets with diverse ideologies
+    const [markets, setMarkets] = React.useState([
         {
             id: '1',
             question: "Will Monad go live by early 2026?",
-            yesPool: "1,240 Credits",
-            noPool: "850 Credits",
-            totalPool: "2,090 Credits",
+            yesPool: 1240,
+            noPool: 850,
             endTime: "4 days",
+            category: "Crypto"
         },
         {
             id: '2',
             question: "Will fees stay super low today?",
-            yesPool: "2,500 Credits",
-            noPool: "1,100 Credits",
-            totalPool: "3,600 Credits",
+            yesPool: 2500,
+            noPool: 1100,
             endTime: "12 hours",
+            category: "Network"
         },
         {
             id: '3',
             question: "Will Bitcoin hit $150k soon?",
-            yesPool: "15,800 Credits",
-            noPool: "4,200 Credits",
-            totalPool: "20,000 Credits",
+            yesPool: 15800,
+            noPool: 4200,
             endTime: "11 days",
+            category: "Market"
         },
-    ];
+        {
+            id: '4',
+            question: "Will Ethereum flip Bitcoin in 2026?",
+            yesPool: 5000,
+            noPool: 25400,
+            endTime: "1 year",
+            category: "Crypto"
+        },
+        {
+            id: '5',
+            question: "Real Madrid to win Champions League?",
+            yesPool: 8900,
+            noPool: 6200,
+            endTime: "5 months",
+            category: "Sports"
+        },
+        {
+            id: '6',
+            question: "AI to replace 10% of coders by 2027?",
+            yesPool: 3200,
+            noPool: 4100,
+            endTime: "2 years",
+            category: "Tech"
+        }
+    ]);
+
+    // Simulate "Internet Stats" updates (Live Odds)
+    React.useEffect(() => {
+        const interval = setInterval(() => {
+            setMarkets(currentMarkets =>
+                currentMarkets.map(m => ({
+                    ...m,
+                    yesPool: m.yesPool + Math.floor(Math.random() * 10), // Randomly increase
+                    noPool: m.noPool + Math.floor(Math.random() * 5),
+                }))
+            );
+        }, 3000); // Update every 3 seconds
+
+        return () => clearInterval(interval);
+    }, []);
+
+    const formatPool = (val: number) => `${val.toLocaleString()} Credits`;
 
     const truncateAddress = (addr: string) => {
         return `Account ${addr.slice(0, 4)}`;
     };
 
+    // ... (rest of functions: handleBet, handleShare) -> No change needed generally, just calling formatPool
+
     const handleBet = (marketId: string, choice: 'YES' | 'NO') => {
         console.log(`Choice: ${choice} for ${marketId}`);
-        // Navigate to details or open bet modal
         navigation.navigate('MarketDetails', { marketId, initialChoice: choice });
     };
 
@@ -66,6 +109,11 @@ export default function HomeScreen({ navigation }: any) {
                 <View>
                     <Text style={styles.greeting}>Hey there! 👋</Text>
                     <Text style={styles.logo}>Pulse</Text>
+                    {isConnected && (
+                        <Text style={{ color: Theme.colors.success, fontSize: 12, fontWeight: '700', marginTop: 4 }}>
+                            {parseFloat(balance).toFixed(4)} MON
+                        </Text>
+                    )}
                 </View>
                 <View style={styles.headerIcons}>
                     <TouchableOpacity
@@ -96,19 +144,18 @@ export default function HomeScreen({ navigation }: any) {
                     </TouchableOpacity>
                 </View>
 
-                {mockMarkets.map(market => (
+                {markets.map(market => (
                     <MarketCard
                         key={market.id}
                         question={market.question}
-                        yesPool={market.yesPool}
-                        noPool={market.noPool}
-                        totalPool={market.totalPool}
+                        yesPool={formatPool(market.yesPool)}
+                        noPool={formatPool(market.noPool)}
+                        totalPool={formatPool(market.yesPool + market.noPool)}
                         endTime={market.endTime}
                         isDemo={isDemoMode}
                         onPress={() => navigation.navigate('MarketDetails', { marketId: market.id })}
                         onBet={(choice) => handleBet(market.id, choice)}
                         onShare={() => handleShare(market)}
-                        // Pass the number of friends who joined this specific market
                         friendsJoined={friendsInMarkets[market.id] || 0}
                     />
                 ))}
