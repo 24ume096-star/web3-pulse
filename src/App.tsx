@@ -1,6 +1,6 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount, useBalance } from 'wagmi';
-import { Trophy, TrendingUp, Clock, Wallet, Coins, Newspaper, Zap } from 'lucide-react';
+import { Trophy, TrendingUp, Clock, Wallet, Coins, Newspaper } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useDemo } from './context/DemoContext';
 import { useState, useEffect } from 'react';
