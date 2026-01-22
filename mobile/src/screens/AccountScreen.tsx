@@ -4,10 +4,12 @@ import { Theme } from '../theme';
 import { User, Copy, Share2, Award, TrendingUp, LogOut } from 'lucide-react-native';
 import { useWallet } from '../context/WalletContext';
 import { useReferral } from '../context/ReferralContext';
+import { useUserStats } from '../context/UserStatsContext';
 
 export default function AccountScreen() {
-    const { address, disconnect, isConnected } = useWallet();
+    const { address, disconnect, isConnected, balance } = useWallet();
     const { referralCode, referredCount, referralEarnings } = useReferral();
+    const { stats, trendSense } = useUserStats();
 
     const handleCopyCode = () => {
         // Mock copy logic
@@ -53,6 +55,31 @@ export default function AccountScreen() {
                     </View>
                     <Text style={styles.username}>Account {address?.slice(2, 6)}</Text>
                     <Text style={styles.address}>{address}</Text>
+                </View>
+
+                {/* New: Trend Mastery Card */}
+                <View style={styles.masteryCard}>
+                    <View style={styles.masteryHeader}>
+                        <TrendingUp size={20} color={Theme.colors.primary} />
+                        <Text style={styles.masteryTitle}>Trend Sense</Text>
+                        <View style={styles.accuracyBadge}>
+                            <Text style={styles.accuracyText}>{trendSense}% Accuracy</Text>
+                        </View>
+                    </View>
+                    <View style={styles.statsGrid}>
+                        <View style={styles.statItem}>
+                            <Text style={styles.statValueSmall}>{stats.totalPredictions}</Text>
+                            <Text style={styles.statLabelSmall}>Trends Read</Text>
+                        </View>
+                        <View style={styles.statItem}>
+                            <Text style={styles.statValueSmall}>{stats.wins}</Text>
+                            <Text style={styles.statLabelSmall}>Waves Caught</Text>
+                        </View>
+                        <View style={styles.statItem}>
+                            <Text style={styles.statValueSmall}>{trendSense}%</Text>
+                            <Text style={styles.statLabelSmall}>Accuracy</Text>
+                        </View>
+                    </View>
                 </View>
 
                 <View style={styles.referralCard}>
@@ -236,6 +263,57 @@ const styles = StyleSheet.create({
         fontSize: 10,
         color: Theme.colors.textDim,
         marginTop: 2,
+    },
+    masteryCard: {
+        backgroundColor: 'rgba(131, 110, 249, 0.08)',
+        borderRadius: Theme.borderRadius.lg,
+        padding: Theme.spacing.lg,
+        borderWidth: 1,
+        borderColor: 'rgba(131, 110, 249, 0.2)',
+        marginBottom: 24,
+    },
+    masteryHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginBottom: 16,
+    },
+    masteryTitle: {
+        fontSize: 18,
+        fontWeight: '900',
+        color: Theme.colors.text,
+        flex: 1,
+    },
+    accuracyBadge: {
+        backgroundColor: Theme.colors.primary,
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 12,
+    },
+    accuracyText: {
+        color: 'white',
+        fontSize: 12,
+        fontWeight: '900',
+    },
+    statsGrid: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingTop: 8,
+    },
+    statItem: {
+        alignItems: 'center',
+    },
+    statLabelSmall: {
+        fontSize: 10,
+        color: Theme.colors.textDim,
+        fontWeight: '700',
+        textTransform: 'uppercase',
+        marginBottom: 4,
+    },
+    statValueSmall: {
+        fontSize: 18,
+        fontWeight: '900',
+        color: Theme.colors.text,
     },
     centered: {
         flex: 1,

@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { StyleSheet, Text, View, SafeAreaView, TouchableOpacity, ScrollView, Dimensions } from 'react-native';
 import { Theme } from '../theme';
-import { ChevronLeft, Info, AlertTriangle, TrendingUp, Users, User, Share2 } from 'lucide-react-native';
+import { ChevronLeft, Info, AlertTriangle, TrendingUp, Users, User, Share2, Zap, Clock } from 'lucide-react-native';
 import { useWallet } from '../context/WalletContext';
 import { useDemo } from '../context/DemoContext';
 import { useReferral } from '../context/ReferralContext';
+import { useUserStats } from '../context/UserStatsContext';
 import { shareMarket } from '../utils/shareUtility';
 import Haptics from '../utils/haptics';
 import ConfettiCannon from '../components/ConfettiWrapper';
+import { ResultOverlay } from '../components/ResultOverlay';
 
 const { width } = Dimensions.get('window');
 
@@ -15,11 +17,13 @@ export default function MarketDetailScreen({ navigation, route }: any) {
     const { address } = useWallet();
     const { isDemoMode } = useDemo();
     const { referralCode, addReferral, friendsInMarkets, joinMarket } = useReferral();
+    const { recordPrediction, recordWin } = useUserStats();
     const [selectedAmount, setSelectedAmount] = useState<number | null>(null);
     const [selectedOutcome, setSelectedOutcome] = useState<'YES' | 'NO' | null>(null);
     const [isResolving, setIsResolving] = useState(false);
     const [showConfetti, setShowConfetti] = useState(false);
     const [resolutionResult, setResolutionResult] = useState<'WIN' | 'LOSS' | null>(null);
+    const [showResultOverlay, setShowResultOverlay] = useState(false);
 
     // Mock user bet data
     const userBet = {
@@ -46,6 +50,7 @@ export default function MarketDetailScreen({ navigation, route }: any) {
         if (!selectedAmount || !selectedOutcome) return;
 
         Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+        recordPrediction();
         console.log(`Choice: ${selectedOutcome} for ${selectedAmount}`);
 
         if (isDemoMode) {
@@ -65,17 +70,13 @@ export default function MarketDetailScreen({ navigation, route }: any) {
 
                     if (isWin) {
                         setShowConfetti(true);
+                        recordWin(Number(selectedAmount) * 0.9); // Record profit as points
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
                     } else {
                         Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
                     }
 
-                    setTimeout(() => {
-                        alert(isWin
-                            ? `BOOM! 🚀 You predicted correctly and scored ${(selectedAmount * 1.9).toFixed(0)} Credits!`
-                            : `Ouch! 📉 The pulse went the other way. Better luck next time!`);
-                        navigation.goBack();
-                    }, 500);
+                    setShowResultOverlay(true);
                 } catch (error) {
                     setIsResolving(false);
                     console.error("Demo resolution failed:", error);
@@ -119,18 +120,18 @@ export default function MarketDetailScreen({ navigation, route }: any) {
                     <View style={styles.metaInfo}>
                         <View style={styles.metaItem}>
                             <Users size={14} color={Theme.colors.textDim} />
-                            <Text style={styles.metaText}>{marketData.participants} Players</Text>
+                            <Text style={styles.metaText}>{marketData.participants} Players Active</Text>
                         </View>
                         <View style={styles.metaItem}>
                             <TrendingUp size={14} color={Theme.colors.textDim} />
-                            <Text style={styles.metaText}>{marketData.totalPool} Credits Pool</Text>
+                            <Text style={styles.metaText}>{marketData.totalPool.toLocaleString()} Momentum</Text>
                         </View>
                     </View>
 
                     <View style={styles.poolSection}>
                         <View style={styles.poolHeader}>
-                            <Text style={styles.poolTitle}>Global Consensus</Text>
-                            <Text style={styles.poolTotal}>{marketData.totalPool} Credits</Text>
+                            <Text style={styles.poolTitle}>Trend Consensus</Text>
+                            <Text style={styles.poolTotal}>{marketData.totalPool} Concentration</Text>
                         </View>
                         <View style={styles.progressTrack}>
                             <View style={[styles.progressFill, { width: `${(marketData.yesPool / marketData.totalPool) * 100}%` }]} />
@@ -142,15 +143,108 @@ export default function MarketDetailScreen({ navigation, route }: any) {
                     </View>
                 </View>
 
+                {/* News Momentum Section */}
+                <View style={styles.momentumCard}>
+                    <View style={styles.momentumHeader}>
+                        <View>
+                            <Text style={styles.momentumTitle}>Live news momentum</Text>
+                            <Text style={styles.momentumSubtitle}>
+                                Trending due to {route.params?.metadata?.articleCount || 8} news articles in the last {Math.floor((route.params?.metadata?.recencyScore || 75) / 10)} hours.
+                            </Text>
+                        </View>
+                        <View style={styles.momentumBadge}>
+                            <Text style={styles.momentumBadgeText}>
+                                {route.params?.metadata?.trendState || 'DETECTED'}
+                            </Text>
+                        </View>
+                        <View style={styles.scoreBadge}>
+                            <Text style={styles.scoreBadgeText}>
+                                {Math.min(99, Math.floor(((route.params?.metadata?.articleCount || 8) / 20) * 60 + (route.params?.metadata?.recencyScore || 75) * 0.4))}%
+                            </Text>
+                        </View>
+                    </View>
+
+                    <View style={styles.momentumBarTrack}>
+                        <View style={[
+                            styles.momentumBarFill,
+                            { width: `${Math.min(100, ((route.params?.metadata?.articleCount || 8) / 20) * 60 + (route.params?.metadata?.recencyScore || 75) * 0.4)}%` }
+                        ]} />
+                    </View>
+
+                    <View style={styles.momentumStats}>
+                        <View style={styles.momStat}>
+                            <Text style={styles.momStatVal}>{route.params?.metadata?.articleCount || 8}</Text>
+                            <Text style={styles.momStatLabel}>Recent Articles</Text>
+                        </View>
+                        <View style={styles.momStat}>
+                            <Text style={styles.momStatVal}>{Math.floor((route.params?.metadata?.recencyScore || 75) / 10)}h ago</Text>
+                            <Text style={styles.momStatLabel}>Last Pulse</Text>
+                        </View>
+                        <View style={styles.momStat}>
+                            <Text style={styles.momStatVal}>HIGH</Text>
+                            <Text style={styles.momStatLabel}>Velocity</Text>
+                        </View>
+                    </View>
+                </View>
+
+                {/* Sentiment Indicators Section */}
+                {route.params?.metadata?.sentiment && (
+                    <View style={styles.sentimentCard}>
+                        <View style={styles.sentimentHeader}>
+                            <Clock size={16} color={Theme.colors.textDim} />
+                            <Text style={styles.sentimentTitle}>Trend Psychology Flow</Text>
+                        </View>
+
+                        <View style={styles.sentimentRow}>
+                            <View style={styles.sentimentPhase}>
+                                <Text style={styles.phaseLabel}>EARLY (30%)</Text>
+                                <Text style={styles.sentimentInsight}>
+                                    Crowd leaned {route.params.metadata.sentiment.earlyPhase.yes > 50 ? 'YES' : 'NO'}
+                                </Text>
+                                <View style={styles.miniSentimentTrack}>
+                                    <View style={[
+                                        styles.miniSentimentFill,
+                                        {
+                                            width: `${route.params.metadata.sentiment.earlyPhase.yes}%`,
+                                            backgroundColor: route.params.metadata.sentiment.earlyPhase.yes > 50 ? Theme.colors.success : Theme.colors.error
+                                        }
+                                    ]} />
+                                </View>
+                            </View>
+
+                            <View style={styles.phaseDivider} />
+
+                            <View style={styles.sentimentPhase}>
+                                <Text style={styles.phaseLabel}>LATE (70%)</Text>
+                                <Text style={styles.sentimentInsight}>
+                                    {route.params.metadata.sentiment.earlyPhase.yes > 50 === route.params.metadata.sentiment.latePhase.yes > 50
+                                        ? `Conviction stayed ${route.params.metadata.sentiment.latePhase.yes > 50 ? 'YES' : 'NO'}`
+                                        : `Crowd shifted ${route.params.metadata.sentiment.latePhase.yes > 50 ? 'YES' : 'NO'}`
+                                    }
+                                </Text>
+                                <View style={styles.miniSentimentTrack}>
+                                    <View style={[
+                                        styles.miniSentimentFill,
+                                        {
+                                            width: `${route.params.metadata.sentiment.latePhase.yes}%`,
+                                            backgroundColor: route.params.metadata.sentiment.latePhase.yes > 50 ? Theme.colors.success : Theme.colors.error
+                                        }
+                                    ]} />
+                                </View>
+                            </View>
+                        </View>
+                    </View>
+                )}
+
                 {userBet && (
                     <View style={styles.userBetCard}>
                         <View style={styles.userBetHeader}>
                             <User size={16} color={Theme.colors.primary} />
-                            <Text style={styles.userBetTitle}>Your Choice</Text>
+                            <Text style={styles.userBetTitle}>Your Position</Text>
                         </View>
                         <View style={styles.userBetContent}>
-                            <Text style={styles.userBetText}>You picked <Text style={styles.userBetOutcome}>{userBet.outcome}</Text></Text>
-                            <Text style={styles.userBetAmount}>{userBet.amount} Credits</Text>
+                            <Text style={styles.userBetText}>You're on <Text style={styles.userBetOutcome}>{userBet.outcome}</Text></Text>
+                            <Text style={styles.userBetAmount}>{userBet.amount} Points</Text>
                         </View>
                     </View>
                 )}
@@ -160,7 +254,7 @@ export default function MarketDetailScreen({ navigation, route }: any) {
                     resolutionResult === 'WIN' && styles.winCard,
                     resolutionResult === 'LOSS' && styles.lossCard
                 ]}>
-                    <Text style={styles.actionTitle}>Pick your side</Text>
+                    <Text style={styles.actionTitle}>Take a stand</Text>
                     <View style={styles.outcomeButtons}>
                         <TouchableOpacity
                             style={[
@@ -188,11 +282,27 @@ export default function MarketDetailScreen({ navigation, route }: any) {
                             }}
                         >
                             <Text style={[styles.outcomeText, selectedOutcome === 'NO' && styles.activeBtnText]}>NO</Text>
-                            <Text style={styles.outcomeSubText}>No way!</Text>
+                            <Text style={styles.outcomeSubText}>Read the trend.</Text>
                         </TouchableOpacity>
                     </View>
 
-                    <Text style={styles.actionTitle}>Score amount</Text>
+                    <View style={styles.actionHeader}>
+                        <Text style={styles.actionTitle}>Commit Attention</Text>
+                        {route.params?.metadata?.suggestedStake && (
+                            <TouchableOpacity
+                                style={styles.suggestedChip}
+                                onPress={() => {
+                                    setSelectedAmount(route.params.metadata.suggestedStake);
+                                    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
+                                }}
+                            >
+                                <Zap size={12} color="white" />
+                                <Text style={styles.suggestedChipText}>
+                                    TREND PICK: {route.params.metadata.suggestedStake}
+                                </Text>
+                            </TouchableOpacity>
+                        )}
+                    </View>
                     <View style={styles.amountButtons}>
                         {[10, 25, 50, 100].map((amount) => (
                             <TouchableOpacity
@@ -231,7 +341,7 @@ export default function MarketDetailScreen({ navigation, route }: any) {
                         }}
                     >
                         <Share2 size={16} color="white" />
-                        <Text style={styles.challengeBtnText}>Challenge a Friend</Text>
+                        <Text style={styles.socialBtnText}>Challenge a Friend</Text>
                     </TouchableOpacity>
                 </View>
             </ScrollView>
@@ -247,23 +357,38 @@ export default function MarketDetailScreen({ navigation, route }: any) {
                 >
                     <Text style={styles.confirmBtnText}>
                         {isResolving
-                            ? 'Processing Results...' // Changed text
+                            ? 'Sensing the wave...'
                             : (!selectedAmount || !selectedOutcome)
-                                ? 'Pick a Side & Confirm' // Changed text
-                                : `Confirm ${selectedAmount} Credits`} {/* Changed 'MON' to 'Credits' */}
+                                ? 'Predict the moment'
+                                : `Confirm ${selectedAmount} Points`}
                     </Text>
                 </TouchableOpacity>
             </View>
 
-            {showConfetti && (
-                <ConfettiCannon
-                    count={200}
-                    origin={{ x: width / 2, y: -20 }}
-                    fadeOut={true}
-                    fallSpeed={3000}
-                />
-            )}
-        </SafeAreaView>
+            {
+                showConfetti && (
+                    <ConfettiCannon
+                        count={200}
+                        origin={{ x: width / 2, y: -20 }}
+                        fadeOut={true}
+                        fallSpeed={3000}
+                    />
+                )
+            }
+
+            <ResultOverlay
+                visible={showResultOverlay}
+                result={resolutionResult || 'LOSS'}
+                question={marketData.question}
+                outcome={selectedOutcome || 'YES'}
+                winnings={selectedAmount ? (selectedAmount * 1.9).toFixed(0) : '0'}
+                marketId={marketData.id}
+                onClose={() => {
+                    setShowResultOverlay(false);
+                    navigation.goBack();
+                }}
+            />
+        </SafeAreaView >
     );
 }
 
@@ -445,7 +570,32 @@ const styles = StyleSheet.create({
         fontWeight: '700',
         textTransform: 'uppercase',
         letterSpacing: 1,
+    },
+    actionHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
         marginBottom: 12,
+    },
+    suggestedChip: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 6,
+        backgroundColor: Theme.colors.primary,
+        paddingHorizontal: 10,
+        paddingVertical: 5,
+        borderRadius: 12,
+        shadowColor: Theme.colors.primary,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 8,
+        elevation: 4,
+    },
+    suggestedChipText: {
+        color: 'white',
+        fontSize: 10,
+        fontWeight: '900',
+        letterSpacing: 0.5,
     },
     outcomeButtons: {
         flexDirection: 'row',
@@ -583,9 +733,150 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 8,
     },
-    challengeBtnText: {
+    socialBtnText: {
         color: 'white',
         fontSize: 14,
         fontWeight: '700',
+    },
+    // Momentum Card
+    momentumCard: {
+        backgroundColor: Theme.colors.surface,
+        borderRadius: Theme.borderRadius.lg,
+        padding: Theme.spacing.lg,
+        borderWidth: 1,
+        borderColor: Theme.colors.border,
+        marginBottom: Theme.spacing.lg,
+    },
+    momentumHeader: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    momentumTitle: {
+        color: Theme.colors.text,
+        fontSize: 16,
+        fontWeight: '800',
+    },
+    momentumSubtitle: {
+        color: Theme.colors.textDim,
+        fontSize: 12,
+        fontWeight: '600',
+    },
+    momentumBadge: {
+        backgroundColor: Theme.colors.primary,
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 10,
+        marginRight: 8,
+    },
+    scoreBadge: {
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        paddingHorizontal: 10,
+        paddingVertical: 4,
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: 'rgba(255, 255, 255, 0.1)',
+    },
+    momentumBadgeText: {
+        color: 'white',
+        fontSize: 12,
+        fontWeight: '900',
+        letterSpacing: 1,
+    },
+    scoreBadgeText: {
+        color: Theme.colors.primary,
+        fontSize: 14,
+        fontWeight: '900',
+    },
+    momentumBarTrack: {
+        height: 8,
+        backgroundColor: 'rgba(255, 255, 255, 0.05)',
+        borderRadius: 4,
+        overflow: 'hidden',
+        marginBottom: 20,
+    },
+    momentumBarFill: {
+        height: '100%',
+        backgroundColor: Theme.colors.primary,
+        borderRadius: 2,
+    },
+    momentumStats: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingTop: 12,
+        borderTopWidth: 1,
+        borderTopColor: 'rgba(255,255,255,0.05)',
+    },
+    sentimentCard: {
+        backgroundColor: Theme.colors.surface,
+        borderRadius: Theme.borderRadius.lg,
+        padding: Theme.spacing.lg,
+        borderWidth: 1,
+        borderColor: Theme.colors.border,
+        marginBottom: Theme.spacing.lg,
+    },
+    sentimentHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        marginBottom: 16,
+    },
+    sentimentTitle: {
+        color: Theme.colors.textDim,
+        fontSize: 12,
+        fontWeight: '700',
+        textTransform: 'uppercase',
+        letterSpacing: 1,
+    },
+    sentimentRow: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    sentimentPhase: {
+        flex: 1,
+    },
+    phaseDivider: {
+        width: 1,
+        height: 40,
+        backgroundColor: Theme.colors.border,
+        marginHorizontal: 16,
+    },
+    phaseLabel: {
+        color: Theme.colors.textDim,
+        fontSize: 10,
+        fontWeight: '800',
+        marginBottom: 4,
+    },
+    sentimentInsight: {
+        color: Theme.colors.text,
+        fontSize: 13,
+        fontWeight: '700',
+        marginBottom: 8,
+    },
+    miniSentimentTrack: {
+        height: 4,
+        backgroundColor: 'rgba(255,255,255,0.05)',
+        borderRadius: 2,
+        overflow: 'hidden',
+    },
+    miniSentimentFill: {
+        height: '100%',
+        borderRadius: 2,
+    },
+    momStat: {
+        alignItems: 'center',
+    },
+    momStatVal: {
+        color: Theme.colors.text,
+        fontSize: 16,
+        fontWeight: '900',
+    },
+    momStatLabel: {
+        color: Theme.colors.textDim,
+        fontSize: 10,
+        fontWeight: '700',
+        textTransform: 'uppercase',
+        marginTop: 4,
     },
 });

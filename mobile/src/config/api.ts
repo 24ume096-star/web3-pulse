@@ -12,7 +12,7 @@ const isDevelopment = __DEV__;
 // Example: 'http://192.168.1.100:3001'
 export const API_BASE_URL = isDevelopment
     ? 'http://localhost:3001'  // Development
-    : 'https://your-production-api.com';  // Production (update when deploying)
+    : 'https://backend-deploy-ayush-kumar-s-projects-fa532792.vercel.app';  // Production
 
 // API Endpoints
 export const API_ENDPOINTS = {

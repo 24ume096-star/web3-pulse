@@ -38,8 +38,8 @@ export default function LeaderboardScreen() {
                                         <Text style={styles.rankBadgeText}>{item.rank}</Text>
                                     </View>
                                 </View>
-                                <Text style={styles.topName} numberOfLines={1}>{item.name}</Text>
-                                <Text style={styles.topWinnings}>{item.rewards} Credits</Text>
+                                <Text style={styles.topName} numberOfLines={1}>{item.rank === 3 && item.name === 'BetMaster' ? 'TrendMaster' : item.name}</Text>
+                                <Text style={styles.topWinnings}>{item.rewards} Points</Text>
                             </View>
                         </View>
                     );
@@ -56,15 +56,15 @@ export default function LeaderboardScreen() {
                     <Text style={styles.name}>{item.name}</Text>
                     <View style={styles.subStats}>
                         <Target size={12} color={Theme.colors.textDim} />
-                        <Text style={styles.subStatText}>{item.guesses} Guesses</Text>
+                        <Text style={styles.subStatText}>{item.guesses} Trends Read</Text>
                         <TrendingUp size={12} color={Theme.colors.success} style={{ marginLeft: 8 }} />
-                        <Text style={[styles.subStatText, { color: Theme.colors.success }]}>{item.accuracy} Hit rate</Text>
+                        <Text style={[styles.subStatText, { color: Theme.colors.success }]}>{item.accuracy} Accuracy</Text>
                     </View>
                 </View>
             </View>
             <View style={styles.winningsInfo}>
                 <Text style={styles.winnings}>{item.rewards}</Text>
-                <Text style={styles.winningsLabel}>Credits</Text>
+                <Text style={styles.winningsLabel}>Points</Text>
             </View>
         </View>
     );
@@ -72,7 +72,7 @@ export default function LeaderboardScreen() {
     return (
         <SafeAreaView style={styles.container}>
             <View style={styles.header}>
-                <Text style={styles.title}>Pulse Stars</Text>
+                <Text style={styles.title}>Trend Masters</Text>
                 <TouchableOpacity style={styles.headerIcon}>
                     <Award size={24} color={Theme.colors.text} />
                 </TouchableOpacity>
@@ -93,13 +93,13 @@ export default function LeaderboardScreen() {
                     </View>
                     <View style={styles.verticalDivider} />
                     <View style={styles.yourStatItem}>
-                        <Text style={styles.yourStatLabel}>Total Rewards</Text>
-                        <Text style={styles.yourStatValue}>1,450 Credits</Text>
+                        <Text style={styles.yourStatLabel}>Points Earned</Text>
+                        <Text style={styles.yourStatValue}>1,450 Points</Text>
                     </View>
                 </View>
 
                 <View style={styles.listHeader}>
-                    <Text style={styles.listTitle}>Global Stars</Text>
+                    <Text style={styles.listTitle}>Top Predictors</Text>
                 </View>
 
                 {LEADERS.slice(3).map((item) => (

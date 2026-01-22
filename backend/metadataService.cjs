@@ -14,6 +14,13 @@ const path = require('path');
 
 const METADATA_FILE = path.join(__dirname, 'marketMetadata.json');
 
+const TREND_STATES = {
+    DETECTED: 'DETECTED',
+    HOT: 'HOT',
+    COOLING: 'COOLING',
+    RESOLVED: 'RESOLVED'
+};
+
 /**
  * Load metadata from JSON file
  */
@@ -47,21 +54,6 @@ function saveMetadata(metadata) {
 }
 
 /**
- * Calculate suggested stake based on trend score
- * 
- * @param {number} trendScore - Score from 0-100
- * @param {string} baseStake - Base stake amount in ETH (e.g., "0.001")
- * @returns {string} Suggested stake in ETH
- */
-function calculateSuggestedStake(trendScore, baseStake = "0.001") {
-    const base = parseFloat(baseStake);
-
-    // Increase stake by 10-50% based on trend score
-    // Score 0-50: +10%
-    // Score 50-75: +10-30%
-    // Score 75-100: +30-50%
-
-    let multiplier = 1.0;
 
     if (trendScore >= 75) {
         // Hot market: +30% to +50%
@@ -79,6 +71,86 @@ function calculateSuggestedStake(trendScore, baseStake = "0.001") {
 }
 
 /**
+ * Calculate activity status based on trend score changes
+ * 
+ * @param {number} currentScore - Current trend score
+ * @param {number} previousScore - Previous trend score (optional)
+ * @returns {string} Activity status: 'increasing', 'stable', or 'decreasing'
+ */
+function calculateActivityStatus(currentScore, previousScore = null) {
+    if (previousScore === null) {
+        return 'increasing'; // Default for new markets
+    }
+
+    const difference = currentScore - previousScore;
+    if (difference > 5) {
+        return 'increasing';
+    } else if (difference < -5) {
+        return 'decreasing';
+    } else {
+        return 'stable';
+    }
+}
+
+/**
+ * Calculate trend state based on momentum scores
+ * 
+ * @param {number} articleCount 
+ * @param {number} recencyScore 
+ * @returns {string} One of TREND_STATES
+ */
+function calculateTrendState(articleCount, recencyScore) {
+    const totalScore = (articleCount / 20) * 60 + recencyScore * 0.4;
+
+    if (totalScore >= 80) return TREND_STATES.HOT;
+    if (totalScore >= 50) return TREND_STATES.DETECTED;
+    if (totalScore >= 20) return TREND_STATES.COOLING;
+    return TREND_STATES.COOLING; // Default to cooling before resolution
+}
+
+/**
+ * Apply time-based confidence decay to metadata
+ * 
+ * @param {object} data - Market metadata entry
+ * @returns {object} Updated entry with decayed scores
+ */
+function applyConfidenceDecay(data) {
+    if (!data.lastUpdated) return data;
+
+    const hoursSinceUpdate = (Date.now() - new Date(data.lastUpdated).getTime()) / (1000 * 60 * 60);
+
+    // Decay article count and recency based on time
+    // Roughly 5% decay per hour
+    const decayFactor = Math.pow(0.95, hoursSinceUpdate);
+
+    const updatedData = {
+        ...data,
+        articleCount: Math.max(1, Math.floor((data.articleCount || 10) * decayFactor)),
+        recencyScore: Math.max(10, Math.floor((data.recencyScore || 80) * decayFactor)),
+    };
+
+    updatedData.trendState = calculateTrendState(updatedData.articleCount, updatedData.recencyScore);
+    updatedData.suggestedStake = calculateSuggestedStake(updatedData);
+
+    return updatedData;
+}
+
+/**
+ * Generate simulated sentiment data for early/late phases
+ * 
+ * @returns {object} Sentiment data
+ */
+function generateSentimentData() {
+    const earlyYes = Math.floor(Math.random() * 60) + 20; // 20-80%
+    const lateYes = Math.floor(Math.random() * 60) + 20; // 20-80%
+
+    return {
+        earlyPhase: { yes: earlyYes, no: 100 - earlyYes },
+        latePhase: { yes: lateYes, no: 100 - lateYes }
+    };
+}
+
+/**
  * Update metadata for a specific market
  * 
  * @param {string} marketAddress - Contract address
@@ -92,11 +164,31 @@ function updateMarketMetadata(marketAddress, updates) {
         metadata[marketAddress] = {};
     }
 
-    // Merge updates
-    metadata[marketAddress] = {
-        ...metadata[marketAddress],
+    const previousScore = metadata[marketAddress].visibilityScore || metadata[marketAddress].trendScore;
+    const currentScore = updates.visibilityScore || updates.trendScore || previousScore;
+
+    // Calculate activity status
+    if (currentScore !== undefined) {
+        updates.activityStatus = calculateActivityStatus(currentScore, previousScore);
+    }
+
+    const articleCount = updates.articleCount || currentData.articleCount || Math.floor(Math.random() * 15) + 5;
+    const recencyScore = updates.recencyScore || currentData.recencyScore || Math.floor(Math.random() * 40) + 60;
+    const trendState = updates.trendState || calculateTrendState(articleCount, recencyScore);
+
+    const baseMetadata = {
+        ...currentData,
         ...updates,
+        articleCount,
+        recencyScore,
+        trendState,
+        sentiment: currentData.sentiment || generateSentimentData(),
         lastUpdated: new Date().toISOString()
+    };
+
+    metadata[marketAddress] = {
+        ...baseMetadata,
+        suggestedStake: calculateSuggestedStake(baseMetadata)
     };
 
     return saveMetadata(metadata);
@@ -184,5 +276,6 @@ module.exports = {
     getMarketMetadata,
     getAllMetadata,
     cleanupOldMetadata,
-    matchMarketToTrend
+    matchMarketToTrend,
+    calculateActivityStatus
 };

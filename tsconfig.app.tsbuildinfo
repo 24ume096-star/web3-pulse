@@ -1,1 +1,1 @@
-{"root":["./src/app.tsx","./src/main.tsx","./src/config/chain.ts","./src/context/democontext.tsx"],"version":"5.6.3"}
+{"root":["./src/app.tsx","./src/main.tsx","./src/components/portfoliodrawer.tsx","./src/components/predictionmodal.tsx","./src/components/redemptionmodal.tsx","./src/components/trendingmarketcard.example.tsx","./src/components/trendingmarketcard.tsx","./src/config/api.ts","./src/config/chain.ts","./src/context/democontext.tsx","./src/hooks/usemarkets.ts","./src/hooks/usemetadata.ts","./src/utils/pointsengine.ts"],"version":"5.6.3"}

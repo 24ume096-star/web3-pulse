@@ -1,7 +1,12 @@
-const { ethers } = require("hardhat");
-const { generateQuestionsForTrends } = require("./generateQuestions");
-const fs = require("fs");
-const path = require("path");
+import pkg from "hardhat";
+const { ethers } = pkg;
+import { generateQuestionsForTrends } from "./generateQuestions.js";
+import fs from "fs";
+import path from "path";
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 /**
  * Deployment Script for PredictionMarket Contracts
@@ -177,9 +182,13 @@ async function main() {
     console.log("=".repeat(60));
 
     // Get signer
-    const [signer] = await ethers.getSigners();
+    const signers = await pkg.ethers.getSigners();
+    if (!signers || signers.length === 0) {
+        throw new Error("❌ No signers found. Please check your .env file and ensure PRIVATE_KEY is set correctly.");
+    }
+    const signer = signers[0];
     const signerAddress = await signer.getAddress();
-    const balance = await ethers.provider.getBalance(signerAddress);
+    const balance = await pkg.ethers.provider.getBalance(signerAddress);
 
     console.log(`👤 Deployer: ${signerAddress}`);
     console.log(`💰 Balance: ${ethers.formatEther(balance)} ETH\n`);
@@ -228,7 +237,7 @@ async function main() {
     console.log("\n" + "=".repeat(60));
     console.log("📊 DEPLOYMENT SUMMARY");
     console.log("=".repeat(60));
-    console.log(`🏭 Factory Address: ${factoryAddress}`);
+    console.log(`实质 Factory Address: ${factoryAddress}`);
     console.log(`✅ Markets Deployed: ${deployedCount}`);
     console.log(`⏭️  Markets Skipped (duplicates): ${skippedCount}`);
     console.log(`📁 Total Markets: ${deploymentData.markets.length}`);

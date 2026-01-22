@@ -24,7 +24,7 @@ export const BetModal: React.FC<BetModalProps> = ({ visible, onClose, outcome, q
                     <View style={styles.dragHandle} />
 
                     <View style={styles.header}>
-                        <Text style={styles.headerTitle}>Predict {outcome}</Text>
+                        <Text style={styles.headerTitle}>Pulse {outcome}</Text>
                         <TouchableOpacity onPress={onClose}>
                             <X size={24} color={Theme.colors.textDim} />
                         </TouchableOpacity>
@@ -33,7 +33,7 @@ export const BetModal: React.FC<BetModalProps> = ({ visible, onClose, outcome, q
                     <Text style={styles.questionSummary}>{question}</Text>
 
                     <View style={styles.inputContainer}>
-                        <Text style={styles.currencyLabel}>MON</Text>
+                        <Text style={styles.currencyLabel}>PTS</Text>
                         <TextInput
                             style={styles.input}
                             placeholder="0.00"
@@ -47,14 +47,10 @@ export const BetModal: React.FC<BetModalProps> = ({ visible, onClose, outcome, q
 
                     <View style={styles.details}>
                         <View style={styles.detailRow}>
-                            <Text style={styles.detailLabel}>Potential Win</Text>
+                            <Text style={styles.detailLabel}>Attention Growth</Text>
                             <Text style={[styles.detailValue, { color: Theme.colors.success }]}>
-                                {amount ? (parseFloat(amount) * 1.8).toFixed(2) : '0.00'} MON
+                                +{amount ? (parseFloat(amount) * 1.8).toFixed(2) : '0.00'} Points
                             </Text>
-                        </View>
-                        <View style={styles.detailRow}>
-                            <Text style={styles.detailLabel}>Network Fee</Text>
-                            <Text style={styles.detailValue}>0.0012 MON</Text>
                         </View>
                     </View>
 
@@ -62,7 +58,7 @@ export const BetModal: React.FC<BetModalProps> = ({ visible, onClose, outcome, q
                         style={[styles.confirmBtn, { backgroundColor: outcome === 'YES' ? Theme.colors.success : Theme.colors.error }]}
                         onPress={() => { }}
                     >
-                        <Text style={styles.confirmText}>Confirm Prediction</Text>
+                        <Text style={styles.confirmText}>Commit Attention</Text>
                     </TouchableOpacity>
                 </View>
             </KeyboardAvoidingView>

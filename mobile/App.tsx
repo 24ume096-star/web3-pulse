@@ -5,6 +5,7 @@ import RootNavigator from './src/navigation/AppNavigator';
 import { WalletProvider } from './src/context/WalletContext';
 import { DemoProvider } from './src/context/DemoContext';
 import { ReferralProvider } from './src/context/ReferralContext';
+import { UserStatsProvider } from './src/context/UserStatsContext';
 import { useWallet } from './src/context/WalletContext';
 
 function AppContent() {
@@ -12,9 +13,11 @@ function AppContent() {
 
     return (
         <ReferralProvider address={address}>
-            <NavigationContainer>
-                <RootNavigator />
-            </NavigationContainer>
+            <UserStatsProvider address={address}>
+                <NavigationContainer>
+                    <RootNavigator />
+                </NavigationContainer>
+            </UserStatsProvider>
         </ReferralProvider>
     );
 }

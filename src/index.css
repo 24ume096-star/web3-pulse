@@ -93,6 +93,37 @@ body {
   font-weight: 700;
 }
 
+.market-card {
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.market-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2);
+}
+
+.share-btn-mini {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--text-dim);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.share-btn-mini:hover {
+  background: rgba(131, 110, 249, 0.1);
+  color: var(--primary);
+  border-color: var(--primary);
+  transform: scale(1.1);
+}
+
 .bet-buttons {
   display: flex;
   gap: 12px;
@@ -194,62 +225,35 @@ body {
   font-size: 14px;
 }
 
-.demo-toggle {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+.demo-pill {
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
-  user-select: none;
-  position: relative;
+  border: 1px solid var(--glass-border);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-dim);
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
-.demo-toggle input[type="checkbox"] {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.demo-toggle .slider {
-  position: relative;
-  width: 48px;
-  height: 24px;
+.demo-pill:hover:not(:disabled) {
   background: rgba(255, 255, 255, 0.1);
-  border-radius: 24px;
-  transition: background 0.3s;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text);
+  border-color: rgba(255, 255, 255, 0.2);
 }
 
-.demo-toggle .slider::before {
-  content: '';
-  position: absolute;
-  width: 18px;
-  height: 18px;
-  left: 3px;
-  top: 2px;
-  background: white;
-  border-radius: 50%;
-  transition: transform 0.3s;
+.demo-pill.active {
+  background: rgba(255, 165, 0, 0.15);
+  color: #ffa500;
+  border-color: rgba(255, 165, 0, 0.3);
 }
 
-.demo-toggle input:checked+.slider {
-  background: linear-gradient(135deg, #ffa500, #ff8c00);
-  border-color: #ffa500;
-}
-
-.demo-toggle input:checked+.slider::before {
-  transform: translateX(24px);
-}
-
-.demo-toggle input:disabled+.slider {
+.demo-pill:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-.demo-toggle .toggle-label {
-  font-size: 14px;
-  font-weight: 500;
-  color: var(--text);
 }
 
 .demo-warning {
@@ -268,5 +272,15 @@ body {
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+
+  to {
+    transform: rotate(360deg);
   }
 }

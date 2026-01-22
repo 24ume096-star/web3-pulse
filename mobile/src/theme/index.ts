@@ -1,13 +1,16 @@
 export const Theme = {
     colors: {
-        primary: '#836EF9',
-        background: '#0A0A0B',
-        surface: '#161618',
+        primary: '#FF2E95', // Pulse Pink
+        secondary: '#836EF9', // Neon Violet
+        background: '#050505', // Deep Black
+        surface: '#121214',
         text: '#FFFFFF',
         textDim: '#A1A1AA',
-        success: '#10B981',
-        error: '#EF4444',
-        border: 'rgba(255, 255, 255, 0.08)',
+        success: '#00F5A0', // Electric Green
+        error: '#FF4D4D',
+        warning: '#FFD700',
+        border: 'rgba(255, 255, 255, 0.05)',
+        accent: '#00D1FF', // Cyan Accent
     },
     spacing: {
         xs: 4,

@@ -7,50 +7,7 @@ const {
     matchMarketToTrend,
     cleanupOldMetadata
 } = require('./metadataService.cjs');
-
-/**
- * Fetch trending topics (inlined to avoid module conflicts)
- */
-async function fetchTrendingTopics() {
-    console.log("🚀 Fetching trending topics...");
-
-    // Simulate API network delay
-    await new Promise(resolve => setTimeout(resolve, 800));
-
-    // Base mock data tailored to the project's context (Web3, Tech, Future)
-    const baseTopics = [
-        { topic: "Bitcoin Halving Aftermath", baseScore: 95 },
-        { topic: "Monad Mainnet Beta", baseScore: 92 },
-        { topic: "AI Agent Economy", baseScore: 88 },
-        { topic: "Solana ETF Approval", baseScore: 85 },
-        { topic: "Nvidia 50-Series GPU", baseScore: 80 },
-        { topic: "Global Interest Rates 2025", baseScore: 78 },
-        { topic: "SpaceX Mars Mission Date", baseScore: 75 },
-        { topic: "Ethereum Gas Fees Low", baseScore: 72 },
-        { topic: "Quantum Internet Tests", baseScore: 68 },
-        { topic: "Digital Identity Regulation", baseScore: 65 }
-    ];
-
-    // Generate dynamic scores
-    const trends = baseTopics.map(item => {
-        // Fluctuate score by -10 to +5
-        const fluctuation = Math.floor(Math.random() * 15) - 10;
-        let score = item.baseScore + fluctuation;
-
-        // Clamp score between 0 and 100
-        score = Math.max(0, Math.min(100, score));
-
-        return {
-            topic: item.topic,
-            score: score
-        };
-    });
-
-    // Sort by popularity score (Descending)
-    trends.sort((a, b) => b.score - a.score);
-
-    return trends;
-}
+const { fetchTrendingTopics } = require('../scripts/fetchTrends.cjs');
 
 /**
  * Cron Job for Market Metadata Updates
@@ -103,7 +60,35 @@ async function updateMarketMetadata_Job() {
         console.log(`✅ Found ${markets.length} deployed markets`);
 
         if (markets.length === 0) {
-            console.log('⚠️  No markets to update');
+            console.log('🎲 No real markets found, updating metadata for simulated market IDs...');
+            // In simulation mode, we use the same IDs we'll generate in /api/markets
+            const marketsToSimulate = [];
+            for (let i = 0; i < 6; i++) {
+                marketsToSimulate.push({
+                    address: `sim-address-${i}`,
+                    question: trendingTopics[i]?.topic || "General Topic"
+                });
+            }
+
+            for (const market of marketsToSimulate) {
+                const matchedTrend = trendingTopics.find(t =>
+                    market.question.toLowerCase().includes(t.topic.toLowerCase()) ||
+                    t.topic.toLowerCase().includes(market.question.toLowerCase())
+                ) || trendingTopics[0];
+
+                const trendScore = matchedTrend?.score || 50;
+                const isHot = trendScore > 75;
+                const suggestedStake = calculateSuggestedStake(trendScore, BASE_STAKE);
+
+                updateMarketMetadata(market.address, {
+                    isHot: isHot,
+                    suggestedStake: suggestedStake,
+                    visibilityScore: trendScore,
+                    trendingTopic: matchedTrend?.topic || "Market Pulse",
+                    trendScore: trendScore
+                });
+            }
+            console.log('✅ Simulated metadata updated');
             return;
         }
 

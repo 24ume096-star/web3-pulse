@@ -7,7 +7,9 @@ interface ReferralContextType {
     referralEarnings: number;
     friendsInMarkets: { [marketId: string]: number }; // New: Stores the count of referred friends in specific markets
     addReferral: () => void;
-    joinMarket: (marketId: string) => void; // New: Function to simulate a friend joining a market
+    joinMarket: (marketId: string) => void;
+    trackChallenge: (marketId: string) => void;
+    getSocialSignal: (marketId: string) => string | null; // New: Get dynamic social proof
 }
 
 const ReferralContext = createContext<ReferralContextType | undefined>(undefined);
@@ -56,16 +58,34 @@ export const ReferralProvider: React.FC<{ children: React.ReactNode, address: st
 
     const joinMarket = (marketId: string) => {
         if (!address) return;
-        // In a real app, this would be triggered by a friend joining via link
-        // For demo purposes, we call this to simulate social density
         const newFriends = { ...friendsInMarkets, [marketId]: (friendsInMarkets[marketId] || 0) + 1 };
         setFriendsInMarkets(newFriends);
-        // Save all stats after a friend joins a market
         saveStats(referredCount, referralEarnings, newFriends);
     };
 
+    const trackChallenge = (marketId: string) => {
+        if (!address) return;
+        const newFriends = { ...friendsInMarkets, [marketId]: (friendsInMarkets[marketId] || 0) + 1 };
+        setFriendsInMarkets(newFriends);
+        saveStats(referredCount, referralEarnings, newFriends);
+    };
+
+    const getSocialSignal = (marketId: string): string | null => {
+        const friends = friendsInMarkets[marketId] || 0;
+
+        // Pseudo-random but deterministic for the marketId to avoid flickering
+        const hash = marketId.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+
+        if (friends > 5) return `${friends} people you follow joined`;
+        if (hash % 7 === 0) return "Momentum shifting ⚡";
+        if (hash % 5 === 0) return "Friends changed the odds 👀";
+        if (hash % 3 === 0 && friends > 0) return `${friends} friends are cooking here`;
+
+        return null;
+    };
+
     return (
-        <ReferralContext.Provider value={{ referralCode, referredCount, referralEarnings, friendsInMarkets, addReferral, joinMarket }}>
+        <ReferralContext.Provider value={{ referralCode, referredCount, referralEarnings, friendsInMarkets, addReferral, joinMarket, trackChallenge, getSocialSignal }}>
             {children}
         </ReferralContext.Provider>
     );

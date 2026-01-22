@@ -1,0 +1,50 @@
+{
+  "sim-address-0": {
+    "isHot": true,
+    "suggestedStake": "0.0014",
+    "visibilityScore": 89,
+    "trendingTopic": "Bitcoin Halving Aftermath",
+    "trendScore": 89,
+    "lastUpdated": "2026-01-21T19:10:00.849Z"
+  },
+  "sim-address-1": {
+    "isHot": true,
+    "suggestedStake": "0.0014",
+    "visibilityScore": 89,
+    "trendingTopic": "AI Agent Economy",
+    "trendScore": 89,
+    "lastUpdated": "2026-01-21T19:10:00.851Z"
+  },
+  "sim-address-2": {
+    "isHot": true,
+    "suggestedStake": "0.0014",
+    "visibilityScore": 82,
+    "trendingTopic": "Monad Mainnet Beta",
+    "trendScore": 82,
+    "lastUpdated": "2026-01-21T19:10:00.854Z"
+  },
+  "sim-address-3": {
+    "isHot": true,
+    "suggestedStake": "0.0013",
+    "visibilityScore": 77,
+    "trendingTopic": "Solana ETF Approval",
+    "trendScore": 77,
+    "lastUpdated": "2026-01-21T19:10:00.856Z"
+  },
+  "sim-address-4": {
+    "isHot": false,
+    "suggestedStake": "0.0013",
+    "visibilityScore": 75,
+    "trendingTopic": "SpaceX Mars Mission Date",
+    "trendScore": 75,
+    "lastUpdated": "2026-01-21T19:10:00.859Z"
+  },
+  "sim-address-5": {
+    "isHot": false,
+    "suggestedStake": "0.0013",
+    "visibilityScore": 75,
+    "trendingTopic": "Ethereum Gas Fees Low",
+    "trendScore": 75,
+    "lastUpdated": "2026-01-21T19:10:00.861Z"
+  }
+}
